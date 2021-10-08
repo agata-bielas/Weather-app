@@ -7,5 +7,11 @@
 <h2>Actual Temperature: {{ temp }}° C</h2>
 <h2>Feels like: {{temp_feels}}° C</h2>
 <h2>Winter speed: {{ wind_speed }} km/h</h2>
+
+{% for param in database %}
+    <div>{{ param }}</div>
+{% endfor %}
+
+
 </body>
 </html>
