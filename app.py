@@ -8,11 +8,10 @@ app = Flask(__name__)
 @app.route('/')
 def weather_home_page():
     api_key = get_api_key()
-    print("pobieram dane z api")
     data = get_actual_weather(api_key)
     temp = data["main"]["temp"]
     temp_feels = data["main"]["feels_like"]
-    wind_speed = data["wind"]["speed"]
+    wind_speed = data["wind"]["speed"]*3.6
     location = data["name"]
     return render_template('home.html',
                            temp=temp, temp_feels=temp_feels,
