@@ -16,6 +16,7 @@ def create_table():
                     'temp REAL, ' \
                     'temp_feels_like REAL, ' \
                     'wind_speed REAL, ' \
-                    'data TEXT)'
+                    'data INT)'
 
     cursor.execute(statement_sql)
+
