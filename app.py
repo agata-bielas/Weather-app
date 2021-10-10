@@ -2,7 +2,7 @@ import requests
 import configparser
 from flask import Flask, render_template
 from db import get_db, create_table
-import time
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -11,17 +11,17 @@ app = Flask(__name__)
 def weather_home_page():
     api_key = get_api_key()
     data = get_actual_weather(api_key)
-    temp = data["main"]["temp"]
-    temp_feels = data["main"]["feels_like"]
-    wind_speed = data["wind"]["speed"]*3.6
+    temp = data['main']["temp"]
+    temp_feels = data['main']["feels_like"]
+    wind_speed = data["wind"]["speed"] * 3.6
     location = data["name"]
     day = data["dt"]
-    print(day) # dzien ma byc w formacie "2021-10-8 14:00:00" lub innym chce to zapisac do bazydanych
     insert_weather_conditions_in_db(temp, temp_feels, wind_speed, day)
     data_from_db = get_weather_conditions_form_db()
     return render_template('home.html',
-                           temp=temp, temp_feels=temp_feels,
-                           wind_speed=wind_speed, location=location, database=data_from_db)
+                           temp=int(temp), temp_feels=int(temp_feels),
+                           wind_speed=int(wind_speed), location=location,
+                           day=datetime.fromtimestamp(day).strftime("%H:%M %A %d/%m/%Y "), baza=data_from_db)
 
 
 def get_weather_conditions_form_db():
@@ -71,10 +71,10 @@ def get_foreseen_weather(api_key):
 
 if __name__ == '__main__':
     """
-        Create table in database db.sqlid3
+        Create table in database db.sqlite3
     """
     create_table()
 
-    app.run()
+    app.run(host='0.0.0.0', port=8000, debug=False)
 
 
