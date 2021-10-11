@@ -14,6 +14,11 @@ turbo = Turbo(app)
 
 @app.route('/')
 def weather_home_page():
+    min_temp = get_min_temperature_from_db()
+    max_temp = get_max_temperature_from_db()
+    avg_temp = get_avg_temperature_from_db()
+    print("Wartosci temp: ")
+    print("min: ", min_temp, "max: ", max_temp, 'avg: ', avg_temp)
     baza = get_weather_conditions_form_db()
     return render_template('home.html', baza=baza)
 
@@ -58,6 +63,39 @@ def get_weather_conditions_form_db():
     data = cursor.fetchall()
     db.close()
     return data
+
+
+def get_min_temperature_from_db():
+    db = get_db()
+    cursor = db.cursor()
+    statement_sql = 'SELECT MIN(temp) From weather_conditions'
+    cursor.execute(statement_sql)
+    # Fetchall() give a list of tuples. Min temp is only one value, that return min_temp[0][0].
+    min_temp = cursor.fetchall()
+    db.close()
+    return min_temp[0][0]
+
+
+def get_max_temperature_from_db():
+    db = get_db()
+    cursor = db.cursor()
+    statement_sql = 'SELECT MAX(temp) From weather_conditions'
+    cursor.execute(statement_sql)
+    max_temp = cursor.fetchall()
+    db.close()
+    # Fetchall() give a list of tuples. Max temp is only one value, that return max_temp[0][0].
+    return max_temp[0][0]
+
+
+def get_avg_temperature_from_db():
+    db = get_db()
+    cursor = db.cursor()
+    statement_sql = 'SELECT AVG(temp) From weather_conditions'
+    cursor.execute(statement_sql)
+    avg_temp = cursor.fetchall()
+    db.close()
+    # Fetchall() give a list of tuples. Avg temp is only one value, that return avg_temp[0][0].
+    return avg_temp[0][0]
 
 
 def insert_weather_conditions_in_db(temp, temp_feels_like, wind_speed, data):
