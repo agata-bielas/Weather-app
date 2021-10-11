@@ -1,17 +1,7 @@
-<html>
-<head>
-    <title>Weather for K2</title>
-</head>
-<body>
-<h1>Weather for {{ location }}</h1>
-<h4>{{ day }}</h4>
-<h2>Actual Temperature: {{ temp }}° C</h2>
-<h2>Feels like: {{temp_feels}}° C</h2>
-<h2>Winter speed: {{ wind_speed }} km/h</h2>
+{% extends 'base.html' %}
 
-{% for param in baza %}
-    <p>{{ param[0] }}, {{ param[1] }}, {{ param[2] }}</p>
-{% endfor %}
-
-</body>
-</html>
+{% block content %}
+    {% for param in baza %}
+        <h6>{{ param }}</h6>
+    {% endfor %}
+{% endblock %}

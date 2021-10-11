@@ -19,4 +19,4 @@ def create_table():
                     'data INT)'
 
     cursor.execute(statement_sql)
-
+    db.close()
