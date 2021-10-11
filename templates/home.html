@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% for param in baza %}
-        <h6>{{ param }}</h6>
-    {% endfor %}
+
+<form action="/" method="post">
+    <label for="temp">Show </label>
+    <select id="temp" name="temp">
+        <option value="min">Min temp</option>
+        <option value="max">Max temp</option>
+        <option value="avg">Avg temp</option>
+    </select>
+    <input type="submit" value="Get value">
+</form>
+
 {% endblock %}

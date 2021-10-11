@@ -1,6 +1,6 @@
 import requests
 import configparser
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from db import get_db, create_table
 from datetime import datetime
 import time
@@ -12,15 +12,28 @@ app = Flask(__name__)
 turbo = Turbo(app)
 
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def weather_home_page():
-    min_temp = get_min_temperature_from_db()
-    max_temp = get_max_temperature_from_db()
-    avg_temp = get_avg_temperature_from_db()
-    print("Wartosci temp: ")
-    print("min: ", min_temp, "max: ", max_temp, 'avg: ', avg_temp)
-    baza = get_weather_conditions_form_db()
-    return render_template('home.html', baza=baza)
+    if request.method == 'POST':
+        value = request.form['temp']
+        return redirect(url_for("result", valu=value))
+    elif request.method == "GET":
+        return render_template('home.html')
+
+
+@app.route('/<valu>')
+def result(valu):
+    if valu == 'min':
+        data = get_min_temperature_from_db()
+        description = "Minimalna temperatura"
+    elif valu == 'max':
+        data = get_max_temperature_from_db()
+        description = "Maksymalna temperatura"
+    elif valu == 'avg':
+        data = get_avg_temperature_from_db()
+        description = "Średnia temperatura"
+
+    return render_template('results.html', description=description, data=data)
 
 
 @app.context_processor
@@ -32,7 +45,6 @@ def inject_load_data():
     location = data["name"]
     day = data["dt"]
     load = [temp, temp_feels, wind_speed, day, location]
-    print(load)
     # save the datas in database
     insert_weather_conditions_in_db(temp, temp_feels, wind_speed, day)
 
@@ -47,10 +59,7 @@ def before_first_request():
 
 def update_load():
     with app.app_context():
-        i = 0
         while True:
-            i += 1
-            print(i)
             time.sleep(600)
             turbo.push(turbo.replace(render_template('load-weather-conditions.html'), 'load'))
 
