@@ -32,7 +32,7 @@ def inject_load_data():
     insert_weather_conditions_in_db(temp, temp_feels, wind_speed, day)
 
     return {'temp': int(load[0]), 'temp_feels': int(load[1]), 'wind_speed': int(load[2]),
-            'date': load[3], 'location': load[4]}
+            'date': datetime.fromtimestamp(load[3]).strftime("%H:%M %A %d/%m/%Y"), 'location': load[4]}
 
 
 @app.before_first_request
@@ -47,7 +47,7 @@ def update_load():
             i += 1
             print(i)
             time.sleep(600)
-            turbo.push(turbo.replace(render_template('loadavg-weather-conditions.html'), 'load'))
+            turbo.push(turbo.replace(render_template('load-weather-conditions.html'), 'load'))
 
 
 def get_weather_conditions_form_db():
