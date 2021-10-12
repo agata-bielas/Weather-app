@@ -24,8 +24,8 @@ def weather_home_page():
         df = get_data_for_forecast_weather_graph()
         fig = px.line(df, x="Time Forecast", y="Temperatur")
 
-        graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-        return render_template('home.html', graphJSON=graphJSON)
+        graphjson = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        return render_template('home.html', graphJSON=graphjson)
 
 
 def get_data_for_forecast_weather_graph():
@@ -43,17 +43,19 @@ def get_data_for_forecast_weather_graph():
 
 @app.route('/<valu>')
 def result(valu):
+    get_data = 0
+    text = ""
     if valu == 'min':
-        data = get_min_temperature_from_db()
-        description = "Minimalna temperatura"
+        get_data = get_min_temperature_from_db()
+        text = "Minimalna temperatura"
     elif valu == 'max':
-        data = get_max_temperature_from_db()
-        description = "Maksymalna temperatura"
+        get_data = get_max_temperature_from_db()
+        text = "Maksymalna temperatura"
     elif valu == 'avg':
-        data = get_avg_temperature_from_db()
-        description = "Średnia temperatura"
+        get_data = get_avg_temperature_from_db()
+        text = "Średnia temperatura"
 
-    return render_template('results.html', description=description, data=data)
+    return render_template('results.html', description=text, data=get_data)
 
 
 @app.context_processor

@@ -1,9 +1,17 @@
-<div id="load-data" class="load-data">
-    <h3>{{ location }}</h3>
-    <h6>{{ date }}</h6>
-    <h1>{{ temp }}° C</h1>
-    <table>
-        <tr><th>Feels like</th><th>Wind speed</th></tr>
-        <tr><th>{{ temp_feels }}° C</th><th>{{ wind_speed }} km/h</th></tr>
-    </table>
+<h3>{{ location }}</h3>
+<h6>{{ date }}</h6>
+<h1>{{ temp }}° C</h1>
+
+<div class="flex-small-container">
+    <div id="temp-feels">
+        <p>{{ temp_feels }}° C</p>
+        <p>Feels like</p>
+    </div>
+
+    <div id="wind-speed">
+        <p>{{ wind_speed }} km/h</p>
+        <p>Wind speed</p>
+    </div>
 </div>
+
+

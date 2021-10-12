@@ -3,37 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Weather app</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/base.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-    <style>
-        .load-data {
-            float: right;
-            width: 300px;
-            border: 1px solid black;
-            margin-left: 10px;
-            margin-bottom: 10px;
-            padding: 10px;
-        }
-        .load-data th, .load td {
-            padding: 6px;
-            text-align: center;
-        }
-        div {
-        width: 70%;
-        }
-    </style>
     {{ turbo() }}
 </head>
 <body>
+<div class="flex-container">
 
-    {% include 'load-weather-conditions.html' %}
+    <div>
+        {% include 'load-weather-conditions.html' %}
+    </div>
 
-    {% block content %}{% endblock %}
+    <div>
+        {% block content %}{% endblock %}
+    </div>
 
-<div>Piekny wyres czy tyko ja go nie widzę</div>
-<div id="chart" class="chart"></div>
-
-
+    <div>
+        <h3>Forecast weather for five days</h3>
+<!--        here is graph -->
+        <div id="chart" class="chart"></div>
+    </div>
+</div>
 </body>
 <script type="text/javascript">
             var graphs = {{ graphJSON|safe }};
