@@ -6,7 +6,10 @@ from datetime import datetime
 import time
 from turbo_flask import Turbo
 import threading
-
+import pandas as pd
+import json
+import plotly
+import plotly.express as px
 
 app = Flask(__name__)
 turbo = Turbo(app)
@@ -18,7 +21,24 @@ def weather_home_page():
         value = request.form['temp']
         return redirect(url_for("result", valu=value))
     elif request.method == "GET":
-        return render_template('home.html')
+        df = get_data_for_forecast_weather_graph()
+        fig = px.line(df, x="Time Forecast", y="Temperatur")
+
+        graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        return render_template('home.html', graphJSON=graphJSON)
+
+
+def get_data_for_forecast_weather_graph():
+    key_api = get_api_key()
+    get_data = get_foreseen_weather(key_api)
+    time_forecast = [get_data["list"][i]["dt_txt"] for i in range(0, 39)]
+    temp = [get_data["list"][i]["main"]["temp"] for i in range(0, 39)]
+
+    df = pd.DataFrame(data={
+        "Time Forecast": time_forecast,
+        "Temperatur": temp
+    })
+    return df
 
 
 @app.route('/<valu>')
@@ -152,4 +172,4 @@ if __name__ == '__main__':
     """
     create_table()
 
-    app.run(host='0.0.0.0', port=8000, debug=False)
+    app.run(host='0.0.0.0', port=8000, debug=True)
