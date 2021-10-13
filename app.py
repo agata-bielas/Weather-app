@@ -21,14 +21,10 @@ def weather_home_page():
         value = request.form['temp']
         return redirect(url_for("result", valu=value))
     elif request.method == "GET":
-        df = get_data_for_forecast_weather_graph()
-        fig = px.line(df, x="Time Forecast", y="Temperatur")
-
-        graphjson = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-        return render_template('home.html', graphJSON=graphjson)
+        return render_template('home.html', graphJSON=get_graph_for_forecast_weather())
 
 
-def get_data_for_forecast_weather_graph():
+def get_graph_for_forecast_weather():
     key_api = get_api_key()
     get_data = get_foreseen_weather(key_api)
     time_forecast = [get_data["list"][i]["dt_txt"] for i in range(0, 39)]
@@ -38,7 +34,12 @@ def get_data_for_forecast_weather_graph():
         "Time Forecast": time_forecast,
         "Temperatur": temp
     })
-    return df
+
+    fig = px.line(df, x="Time Forecast", y="Temperatur")
+
+    graphjson = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return graphjson
 
 
 @app.route('/<valu>')
@@ -55,7 +56,10 @@ def result(valu):
         get_data = get_avg_temperature_from_db()
         text = "Średnia temperatura"
 
-    return render_template('results.html', description=text, data=get_data)
+    baza = get_all_weather_conditions_from_db()
+    return render_template('results.html',
+                           description=text, data=get_data,
+                           graphJSON=get_graph_for_forecast_weather(), baza=baza)
 
 
 @app.context_processor
@@ -70,8 +74,11 @@ def inject_load_data():
     # save the datas in database
     insert_weather_conditions_in_db(temp, temp_feels, wind_speed, day)
 
-    return {'temp': int(load[0]), 'temp_feels': int(load[1]), 'wind_speed': int(load[2]),
-            'date': datetime.fromtimestamp(load[3]).strftime("%H:%M %A %d/%m/%Y"), 'location': load[4]}
+    return {'temp': load[0],
+            'temp_feels': load[1],
+            'wind_speed': load[2],
+            'date': datetime.fromtimestamp(load[3]).strftime("%H:%M %A %d/%m/%Y"),
+            'location': load[4]}
 
 
 @app.before_first_request
@@ -82,11 +89,17 @@ def before_first_request():
 def update_load():
     with app.app_context():
         while True:
+            # Datas from openweadtermap.org are update every 10 minuts.
+            # turbo in load send new datas to templates.
             time.sleep(600)
             turbo.push(turbo.replace(render_template('load-weather-conditions.html'), 'load'))
 
 
-def get_weather_conditions_form_db():
+def get_all_weather_conditions_from_db():
+    """
+    Query to database to get all data saved in there.
+    :return: list of tuples
+    """
     db = get_db()
     cursor = db.cursor()
     statement_sql = 'SELECT * FROM weather_conditions'
@@ -97,17 +110,25 @@ def get_weather_conditions_form_db():
 
 
 def get_min_temperature_from_db():
+    """
+    Query to database to get minimum temperature
+    :return: minimum temperature
+    """
     db = get_db()
     cursor = db.cursor()
     statement_sql = 'SELECT MIN(temp) From weather_conditions'
     cursor.execute(statement_sql)
-    # Fetchall() give a list of tuples. Min temp is only one value, that return min_temp[0][0].
     min_temp = cursor.fetchall()
     db.close()
+    # Fetchall() give a list of tuples. Min temp is only one value, that return min_temp[0][0].
     return min_temp[0][0]
 
 
 def get_max_temperature_from_db():
+    """
+    Query to database to get maximum temperature
+    :return: maximum temperature
+    """
     db = get_db()
     cursor = db.cursor()
     statement_sql = 'SELECT MAX(temp) From weather_conditions'
@@ -119,6 +140,10 @@ def get_max_temperature_from_db():
 
 
 def get_avg_temperature_from_db():
+    """
+    Query to database to get average of temperature
+    :return: avarege of temperatur
+    """
     db = get_db()
     cursor = db.cursor()
     statement_sql = 'SELECT AVG(temp) From weather_conditions'
@@ -130,6 +155,14 @@ def get_avg_temperature_from_db():
 
 
 def insert_weather_conditions_in_db(temp, temp_feels_like, wind_speed, data):
+    """
+    Function save params to database.
+    :param temp:
+    :param temp_feels_like:
+    :param wind_speed:
+    :param data:
+    :return: True
+    """
     db = get_db()
     cursor = db.cursor()
     statement_sql = 'INSERT INTO weather_conditions(' \
@@ -142,6 +175,11 @@ def insert_weather_conditions_in_db(temp, temp_feels_like, wind_speed, data):
 
 
 def get_api_key():
+    """
+    Function read the api_key from file config.ini.
+    Return api_key with is nesesary to get the data from page openweathermap.org
+    :return: api_key
+    """
     config = configparser.ConfigParser()
     config.read('config.ini')
     return config['openweathermap']['api']
@@ -169,9 +207,7 @@ def get_foreseen_weather(api_key):
 
 
 if __name__ == '__main__':
-    """
-        Create table in database db.sqlite3
-    """
+    # Create table in database db.sqlite3
     create_table()
-
+    # Run the application
     app.run(host='0.0.0.0', port=8000, debug=True)

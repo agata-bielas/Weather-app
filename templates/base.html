@@ -9,22 +9,21 @@
     {{ turbo() }}
 </head>
 <body>
-<div class="flex-container">
-
-    <div>
-        {% include 'load-weather-conditions.html' %}
+    <div class="flex-container">
+        <!--   Load a actual weather conditions.      -->
+        <div>
+            {% include 'load-weather-conditions.html' %}
+        </div>
+        <!--   Block with min temperature, max temperature and average temperature   -->
+        <div>
+            {% block content %}{% endblock %}
+        </div>
+        <!--   Block with graph of forecast weather   -->
+        <div>
+            <h3>Forecast weather for five days</h3>
+            <div id="chart" class="chart"></div>
+        </div>
     </div>
-
-    <div>
-        {% block content %}{% endblock %}
-    </div>
-
-    <div>
-        <h3>Forecast weather for five days</h3>
-<!--        here is graph -->
-        <div id="chart" class="chart"></div>
-    </div>
-</div>
 </body>
 <script type="text/javascript">
             var graphs = {{ graphJSON|safe }};
