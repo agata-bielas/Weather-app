@@ -71,12 +71,13 @@ def inject_load_data():
     location = data["name"]
     day = data["dt"]
     load = [temp, temp_feels, wind_speed, day, location]
+    print('Takie dane powinny być na stronie', load)
     # save the datas in database
-    insert_weather_conditions_in_db(temp, temp_feels, wind_speed, day)
+    insert_weather_conditions_in_db(temp, temp_feels, round(wind_speed, 2), day)
 
-    return {'temp': load[0],
-            'temp_feels': load[1],
-            'wind_speed': load[2],
+    return {'temp': round(load[0]),
+            'temp_feels': round(load[1]),
+            'wind_speed': round(load[2]),
             'date': datetime.fromtimestamp(load[3]).strftime("%H:%M %A %d/%m/%Y"),
             'location': load[4]}
 
@@ -88,10 +89,13 @@ def before_first_request():
 
 def update_load():
     with app.app_context():
+        i = 0
         while True:
+            i += 1
+            print(i)
             # Datas from openweadtermap.org are update every 10 minuts.
             # turbo in load send new datas to templates.
-            time.sleep(600)
+            time.sleep(300)
             turbo.push(turbo.replace(render_template('load-weather-conditions.html'), 'load'))
 
 
