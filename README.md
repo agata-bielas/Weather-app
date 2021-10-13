@@ -1,12 +1,13 @@
 # Weather-app
-> ...
-
+A web application to show actual and five days forecast weadther on Khapalu.
 ## Table of contents
-* [General info](#general-info)
+<!-- * [General info](#general-info)
 * [Technologies](#technologies)
+-->
 * [Active API key](#active-api-key)
 * [Setup](#setup)
 
+<!--
 ## General info
 - ...
 - ...
@@ -14,7 +15,7 @@
 ## Technologies
 - ...
 - ...
-
+-->
 
 ## Active API key
 
