@@ -17,6 +17,11 @@ turbo = Turbo(app)
 
 @app.route('/', methods=['POST', 'GET'])
 def weather_home_page():
+    """
+    Loading home.html to the webpage as method GET.
+    After method POST redirecting to function result with parameter valu (min, max, avg).
+    :return: graph forecast weather
+    """
     if request.method == 'POST':
         value = request.form['temp']
         return redirect(url_for("result", valu=value))
@@ -25,18 +30,30 @@ def weather_home_page():
 
 
 def get_graph_for_forecast_weather():
+    """
+    Loading data from api. Assigning list to params (time_forecast, temp).
+    Creating data frame for graph.
+    Makeing plotly fig into json object.
+    :return: graphjson - graph with forecast weather
+    """
     key_api = get_api_key()
     get_data = get_foreseen_weather(key_api)
     time_forecast = [get_data["list"][i]["dt_txt"] for i in range(0, 39)]
     temp = [get_data["list"][i]["main"]["temp"] for i in range(0, 39)]
 
     df = pd.DataFrame(data={
-        "Time Forecast": time_forecast,
-        "Temperatur": temp
+        "Date": time_forecast,
+        "Temperature°C": temp
     })
 
-    fig = px.line(df, x="Time Forecast", y="Temperatur")
+    fig = px.line(df, x="Date", y="Temperature°C")
 
+    fig.update_layout(
+        margin=dict(l=5, r=20, t=40, b=5)
+    )
+    fig.update_traces(
+        mode='lines+markers'
+    )
     graphjson = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
     return graphjson
@@ -44,22 +61,28 @@ def get_graph_for_forecast_weather():
 
 @app.route('/<valu>')
 def result(valu):
+    """
+    Function sent the extra data to web application.
+    :param valu: is min, max or avg
+    :return: get_data: is minimal temperature, maximal temperature or average temperature depends of param valu
+    :return: graph forecast weather
+    """
     get_data = 0
     text = ""
     if valu == 'min':
         get_data = get_min_temperature_from_db()
-        text = "Minimalna temperatura"
+        text = "Minimal temperature"
     elif valu == 'max':
         get_data = get_max_temperature_from_db()
-        text = "Maksymalna temperatura"
+        text = "Maximal temperature"
     elif valu == 'avg':
         get_data = get_avg_temperature_from_db()
-        text = "Średnia temperatura"
+        text = "Average temperature"
 
-    baza = get_all_weather_conditions_from_db()
     return render_template('results.html',
-                           description=text, data=get_data,
-                           graphJSON=get_graph_for_forecast_weather(), baza=baza)
+                           description=text,
+                           data=round(get_data),
+                           graphJSON=get_graph_for_forecast_weather())
 
 
 @app.context_processor
@@ -71,14 +94,13 @@ def inject_load_data():
     location = data["name"]
     day = data["dt"]
     load = [temp, temp_feels, wind_speed, day, location]
-    print('Takie dane powinny być na stronie', load)
     # save the datas in database
     insert_weather_conditions_in_db(temp, temp_feels, round(wind_speed, 2), day)
 
     return {'temp': round(load[0]),
             'temp_feels': round(load[1]),
             'wind_speed': round(load[2]),
-            'date': datetime.fromtimestamp(load[3]).strftime("%H:%M %A %d/%m/%Y"),
+            'date': datetime.fromtimestamp(load[3]).strftime("%A %d/%m/%Y"),
             'location': load[4]}
 
 
@@ -89,12 +111,9 @@ def before_first_request():
 
 def update_load():
     with app.app_context():
-        i = 0
         while True:
-            i += 1
-            print(i)
             # Datas from openweadtermap.org are update every 10 minuts.
-            # turbo in load send new datas to templates.
+            # turbo in a load send new datas to templates and wait 5 minuts
             time.sleep(300)
             turbo.push(turbo.replace(render_template('load-weather-conditions.html'), 'load'))
 
