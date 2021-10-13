@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<h3>Extra data</h3>
+<h1>{{ data }}°C</h1>
+<h6>{{ description }}</h6>
 
-<p>{{ description }}: {{ data }}° C</p>
-<p>z całego okresu zapisywania danych do bazy.</p>
-<p>Back to <a href="/">home page</a>.</p>
 
-{% for param in baza %}
-{{ param }}<br>
-{% endfor %}
-
+<button><a href="/">Back to home page</a></button>
 {% endblock %}

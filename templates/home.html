@@ -1,15 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<h3>Extra data</h3>
 <form id="weatherForm" action="/" method="post">
-    <label for="weatherSelect">Show </label>
     <select id="weatherSelect" name="temp">
         <option value="min">Min temp</option>
         <option value="max">Max temp</option>
         <option value="avg">Avg temp</option>
     </select>
-    <input id="weatherSubmit" type="submit" value="Get value">
+    <button><input id="weatherSubmit" type="submit" value="Get value"></button>
 </form>
 
 {% endblock %}
