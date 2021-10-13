@@ -1,19 +1,8 @@
-
-#weatherForm {
-    font-family: 'sans-serig';
-    font-size: 24px;
-    padding: 20px;
-}
-
-#weatherSubmit {
-    color: white;
-    background-color: #fa8072;
-    padding: 5px 20px;
-    border-radius: 5px;
-    margin-top: 20px;
-}
-
-
+/* Big Flexible container for trzy small fex-container inside them.
+Small containers are:
+ - actual weather conditions,
+ - plase to showe min temp, max temp and avg temp,
+ - forecast weather for five-days  */
 .flex-container {
     display: flex;
     justify-content: center;
@@ -25,15 +14,16 @@
     background-color: #1d2d44;
     font-family: 'sans-serif';
     color: white;
-    margin: 10px; /* opszar na zewnatrz elementu */
-    padding: 20px; /* odległość od treści na szego elementu do kontenera w którym się końćzy */
+    margin: 10px;
+    padding: 20px;
     text-align: center;
     display: inline-block;
     font-size: 30px;
     opacity: 0.6;
     border-radius: 5px
 }
-/*  */
+
+/* Small flex container to show inside div feels like temperature and wind speed  */
 .flex-small-container {
     display: flex;
     justify-content: space-evenly;
