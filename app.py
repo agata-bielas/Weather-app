@@ -49,7 +49,7 @@ def get_graph_for_forecast_weather():
     fig = px.line(df, x="Date", y="Temperature°C")
 
     fig.update_layout(
-        margin=dict(l=5, r=20, t=40, b=5)
+        margin=dict(l=5, r=10, t=40, b=5)
     )
     fig.update_traces(
         mode='lines+markers'
@@ -128,6 +128,8 @@ def get_all_weather_conditions_from_db():
     statement_sql = 'SELECT * FROM weather_conditions'
     cursor.execute(statement_sql)
     data = cursor.fetchall()
+    # for param in data:
+    #     print(param[0], param[1], param[2], param[3], datetime.fromtimestamp(param[4]).strftime("%H:%m %A %d/%m/%Y"))
     db.close()
     return data
 
