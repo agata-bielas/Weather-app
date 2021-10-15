@@ -141,7 +141,7 @@ def get_min_temperature_from_db():
     """
     db = get_db()
     cursor = db.cursor()
-    statement_sql = 'SELECT MIN(temp) From weather_conditions'
+    statement_sql = 'SELECT MIN(temp) FROM weather_conditions'
     cursor.execute(statement_sql)
     min_temp = cursor.fetchall()
     db.close()
@@ -156,7 +156,7 @@ def get_max_temperature_from_db():
     """
     db = get_db()
     cursor = db.cursor()
-    statement_sql = 'SELECT MAX(temp) From weather_conditions'
+    statement_sql = 'SELECT MAX(temp) FROM weather_conditions'
     cursor.execute(statement_sql)
     max_temp = cursor.fetchall()
     db.close()
@@ -171,7 +171,7 @@ def get_avg_temperature_from_db():
     """
     db = get_db()
     cursor = db.cursor()
-    statement_sql = 'SELECT AVG(temp) From weather_conditions'
+    statement_sql = 'SELECT AVG(temp) FROM weather_conditions'
     cursor.execute(statement_sql)
     avg_temp = cursor.fetchall()
     db.close()
