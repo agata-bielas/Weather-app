@@ -86,36 +86,59 @@ def result(valu):
 
 
 @app.context_processor
-def inject_load_data():
+def inject_load_current_weather_data():
+    """
+    This function is decorated with @app.context_processor, decorator from Flask, which allows the application
+    to add symbols to the Jinja scope. The dictionary that this function returns contains five keys,
+    'temp', 'temp_feels', 'wind_speed', 'date' and 'location', which Flask will make available
+    to all Jinja templates rendered with the render_template() function.
+    """
     data = get_actual_weather()
     temp = data['main']["temp"]
     temp_feels = data['main']["feels_like"]
     wind_speed = data["wind"]["speed"] * 3.6
     location = data["name"]
     day = data["dt"]
-    load = [temp, temp_feels, wind_speed, day, location]
+    load_data = [temp, temp_feels, wind_speed, day, location]
     # save the datas in database
     insert_weather_conditions_in_db(temp, temp_feels, round(wind_speed, 2), day)
 
-    return {'temp': round(load[0]),
-            'temp_feels': round(load[1]),
-            'wind_speed': round(load[2]),
-            'date': datetime.fromtimestamp(load[3]).strftime("%A %d/%m/%Y"),
-            'location': load[4]}
+    return {'temp': round(load_data[0]),
+            'temp_feels': round(load_data[1]),
+            'wind_speed': round(load_data[2]),
+            'date': datetime.fromtimestamp(load_data[3]).strftime("%H:%M:%S %A %d/%m/%Y"),
+            'location': load_data[4]}
 
 
 @app.before_first_request
 def before_first_request():
-    threading.Thread(target=update_load).start()
+    """
+    To push current weather data we need the background thread. Use decorator 'before_first_request' is way to start
+    this background thread and thread will be up and running as soon as the first client connects.
+    The function 'update_load_current_weather_data' is where the page updates are going to be generated.
+    """
+    threading.Thread(target=update_load_current_weather_data).start()
 
 
-def update_load():
+def update_load_current_weather_data():
+    """
+    The function have a loop, and in each loop iteration an update current weather data
+    will be pushed to all connected clients.
+
+    The method turbo.push() sent updates to all clients. This method has only one required argument this is
+    turbo.replace(content, target), replace target with content. Content is render_template
+    with load-weather-conditions.html is the HTML fragment that needs to be updated in the page, given as a string.
+
+    The target argument accepted for these operations is the id of the target element in the page that receives
+    the update. If you review the load-weather-conditions.html template you will notice that the top-level <div>
+    in this template has id="load_current_weather_data".
+    """
     with app.app_context():
         while True:
             # Datas from openweadtermap.org are update every 10 minuts.
             # turbo in a load send new datas to templates and wait 5 minuts
             time.sleep(300)
-            turbo.push(turbo.replace(render_template('load-weather-conditions.html'), 'load'))
+            turbo.push(turbo.replace(render_template('load-weather-conditions.html'), 'load_current_weather_data'))
 
 
 def get_all_weather_conditions_from_db():
